@@ -1,0 +1,24 @@
+# Node
+node_modules/
+dist/
+npm-debug.log*
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+
+# Docker
+.dockerignore
+
+# WhatsApp Bot
+auth_info_baileys/
+
+# OS
+.DS_Store
+Thumbs.db
