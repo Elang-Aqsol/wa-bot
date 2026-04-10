@@ -21,4 +21,5 @@ auth_info_baileys/
 
 # OS
 .DS_Store
-Thumbs.db
+Commands
+Planning/
