@@ -11,19 +11,48 @@ import makeWASocket, {
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import * as path from 'path';
-import * as qrcode from 'qrcode-terminal';
-
+import * as fs from 'fs';
 import { CommandRouter } from '../commands/command-router';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class BaileysService implements OnModuleInit {
   private readonly logger = new Logger(BaileysService.name);
   private socket: WASocket;
 
-  constructor(private readonly commandRouter: CommandRouter) {}
+  constructor(
+    private readonly commandRouter: CommandRouter,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async onModuleInit() {
-    await this.initSocket();
+    const authPath = path.join(process.cwd(), 'auth_info_baileys', 'creds.json');
+    if (fs.existsSync(authPath)) {
+      this.logger.log('Existing credentials found. Auto-connecting to WhatsApp...');
+      await this.initSocket();
+    } else {
+      this.logger.log('No credentials found. Waiting for manual QR generation request.');
+      this.eventEmitter.emit('bot.status', 'idle');
+    }
+  }
+
+  @OnEvent('auth.generate_qr')
+  async handleGenerateQr() {
+    this.logger.log('Manual QR generation requested.');
+    if (!this.socket) {
+      await this.initSocket();
+    }
+  }
+
+  @OnEvent('auth.logout')
+  async handleLogout() {
+    this.logger.log('Executing native Baileys logout...');
+    if (this.socket) {
+      await this.socket.logout();
+      this.socket = null;
+      this.eventEmitter.emit('bot.status', 'idle');
+      this.eventEmitter.emit('bot.log', { type: 'success', message: 'Session disconnected securely.' });
+    }
   }
 
   async initSocket() {
@@ -46,8 +75,8 @@ export class BaileysService implements OnModuleInit {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
-        this.logger.log('Scan the QR code below to link your WhatsApp:');
-        qrcode.generate(qr, { small: true });
+        this.eventEmitter.emit('bot.qr', qr);
+        this.eventEmitter.emit('bot.status', 'waiting_for_scan');
       }
 
       if (connection === 'close') {
@@ -61,15 +90,35 @@ export class BaileysService implements OnModuleInit {
 
         if (shouldReconnect) {
           this.initSocket();
+        } else {
+          // Critical: WhatsApp server forced a logout or we intentionally logged out.
+          // Clear internal reference to allow new authentication flows
+          this.socket = null;
+          this.eventEmitter.emit('bot.status', 'idle');
+
+          // Purge the local session cache securely so Baileys generates fresh keys next time
+          try {
+            const authPath = path.join(process.cwd(), 'auth_info_baileys');
+            if (fs.existsSync(authPath)) {
+              const files = fs.readdirSync(authPath);
+              for (const file of files) {
+                fs.rmSync(path.join(authPath, file), { recursive: true, force: true });
+              }
+            }
+          } catch (error) {
+            this.logger.error(`Failed to purge completely: ${error.message}`);
+          }
         }
       } else if (connection === 'open') {
         this.logger.log('SUCCESS! WhatsApp Bot is online.');
+        this.eventEmitter.emit('bot.status', 'online');
+        this.eventEmitter.emit('bot.log', { type: 'success', message: 'WhatsApp Bot is online.' });
       }
     });
 
     // Handle messages
     this.socket.ev.on('messages.upsert', async (m) => {
-      if (m.type === 'notify') {
+      if (m.type === 'notify' || m.type === 'append') {
         for (const msg of m.messages) {
           await this.commandRouter.resolve(this.socket, msg);
         }

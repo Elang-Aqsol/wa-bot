@@ -8,8 +8,6 @@
   "scripts": {
     "build": "nest build",
     "start": "node scripts/start.js",
-    "stop": "docker compose down",
-    "logout": "docker compose down && rm -rf auth_info_baileys",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main"
@@ -18,12 +16,16 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/websockets": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.0.0",
+    "@nestjs/event-emitter": "^2.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "@whiskeysockets/baileys": "^6.6.0",
     "sharp": "^0.32.6",
     "pino": "^8.16.2",
-    "qrcode-terminal": "^0.12.0"
+    "qrcode-terminal": "^0.12.0",
+    "socket.io": "^4.7.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

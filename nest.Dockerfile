@@ -1,7 +1,7 @@
 FROM node:20-alpine
 
 # Install dependencies for sharp and canvas if needed
-RUN apk add --no-cache libc6-compat ffmpeg libwebp libwebp-tools
+RUN apk add --no-cache libc6-compat ffmpeg libwebp libwebp-tools git
 
 WORKDIR /app
 
