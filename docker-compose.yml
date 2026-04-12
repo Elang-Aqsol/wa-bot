@@ -15,7 +15,7 @@ services:
     restart: always
     environment:
       - PORT=3000
-    command: sh -c "npm install && npm run start:dev"
+    command: sh -c "npm run start:dev"
 
   dashboard:
     build:
@@ -30,4 +30,4 @@ services:
     depends_on:
       - bot
     restart: always
-    command: sh -c "npm install && npm run dev -- --host"
+    command: sh -c "npm run dev -- --host"

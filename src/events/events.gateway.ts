@@ -18,9 +18,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   private readonly logger = new Logger(EventsGateway.name);
+  
+  // Cache the latest status to ensure new dashboard clients get the correct UI state
+  private currentStatus: string = 'idle';
 
   handleConnection(client: any) {
     this.logger.log(`Client connected: ${client.id}`);
+    // Sync the exact current state to the client immediately upon load
+    client.emit('status_update', this.currentStatus);
   }
 
   handleDisconnect(client: any) {
@@ -34,6 +39,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @OnEvent('bot.status')
   handleStatusUpdate(status: string) {
+    this.currentStatus = status;
     this.server.emit('status_update', status);
   }
 

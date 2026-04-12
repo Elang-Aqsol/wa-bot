@@ -7,8 +7,8 @@ A professional, high-performance WhatsApp bot built with **NestJS**, **Baileys.j
 ## 🚀 Features
 
 - **Real-Time Web Dashboard**: View Bot logs, generate QRs, and manage your WhatsApp session securely from a React interface.
-- **Instant Conversion**: Send an image and get a sticker back in seconds.
-- **Smart Resizing**: Automatically resizes and pads images to the required 512x512 format while maintaining aspect ratio.
+- **Video to Animated Sticker**: Support for MP4s/GIFs up to 10 seconds. Automatically extracts, trims, and optimizes framerates for WhatsApp.
+- **Smart Resizing**: Automatically resizes and pads static and animated media to the required 512x512 format while maintaining aspect ratio.
 - **Self-Healing Docker Architecture**: Simple to deploy and auto-resolves common module caching issues.
 - **Session Persistence**: Maintains your WhatsApp login even after restarts. It natively unlinks your session securely on Logout.
 
@@ -19,7 +19,7 @@ A professional, high-performance WhatsApp bot built with **NestJS**, **Baileys.j
 - **Backend Logic**: [NestJS](https://nestjs.com/)
 - **WhatsApp Bridge**: [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
 - **Frontend Dashboard**: [React](https://reactjs.org/) & [Vite](https://vitejs.dev/)
-- **Image Processing**: [Sharp](https://sharp.pixelplumbing.com/)
+- **Image Processing**: [Sharp](https://sharp.pixelplumbing.com/) & [FFmpeg](https://ffmpeg.org/)
 - **Infrastructure**: [Docker](https://www.docker.com/)
 
 ---
@@ -67,8 +67,8 @@ A professional, high-performance WhatsApp bot built with **NestJS**, **Baileys.j
 
 ## 🎮 Usage
 
-- **Create a Sticker**: Send an image to the bot with the caption `/sticker`.
-- **Reply Sticker**: Reply to any existing image message with `/sticker`.
+- **Create a Sticker**: Send an image or video (max 10s) to the bot with the caption `/sticker`.
+- **Reply Sticker**: Reply to any existing image or video with `/sticker`.
 - **Help**: Send `/help` to see all available commands.
 
 *Note: You can use `/s` or `/h` for short. The bot will automatically respond to commands sent from any device, including testing from your own linked phone!*
@@ -79,8 +79,8 @@ A professional, high-performance WhatsApp bot built with **NestJS**, **Baileys.j
 
 - [x] v1: Image to Sticker conversion
 - [x] v1.1: Web Dashboard Integration & Status Monitoring
+- [x] v1.2: Video to Animated Sticker natively via FFmpeg
 - [ ] v2: Background removal (AI integration)
-- [ ] v3: Video to Animated Sticker
 
 ---
 

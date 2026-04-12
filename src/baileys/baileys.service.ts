@@ -118,8 +118,11 @@ export class BaileysService implements OnModuleInit {
 
     // Handle messages
     this.socket.ev.on('messages.upsert', async (m) => {
+      this.logger.log(`Raw Upsert Event: type=${m.type}, count=${m.messages.length}`);
       if (m.type === 'notify' || m.type === 'append') {
         for (const msg of m.messages) {
+          const rawText = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "(no text)";
+          this.logger.log(`Incoming JID: ${msg.key.remoteJid} | fromMe: ${msg.key.fromMe} | text: ${rawText}`);
           await this.commandRouter.resolve(this.socket, msg);
         }
       }
